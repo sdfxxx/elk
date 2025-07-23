@@ -1,0 +1,95 @@
+PUT _ilm/policy/mh-policy
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "actions": {
+          "rollover": {
+            "max_age": "10d",
+            "max_primary_shard_size": "1gb"
+          }
+        }
+      },
+      "delete": {
+        "min_age": "60d",
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}
+
+
+PUT _index_template/mh-logs-process-template
+{
+  "index_patterns": ["mh-logs-process"],
+  "data_stream": {},
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "index.lifecycle.name": "mh-policy"
+    },
+    "mappings": {
+      "properties": {
+        "service": {
+          "type": "text"
+        },
+        "model": {
+          "type": "text"
+        },
+        "method": {
+          "type": "text"
+        },
+        "message": {
+          "type": "text"
+        },
+        "action": {
+          "type": "text"
+        },
+        "expected_value": {
+          "type": "text"
+        },
+        "actual_value": {
+          "type": "text"
+        },
+        "result": {
+          "type": "text"
+        },
+        "level": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+
+PUT _index_template/mh-logs-common-template
+{
+  "index_patterns": ["mh-logs-common"],
+  "data_stream": {},
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "index.lifecycle.name": "mh-policy"
+    },
+    "mappings": {
+      "properties": {
+        "timestamp": {
+          "type": "date"
+        },
+        "message": {
+          "type": "text"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "service": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

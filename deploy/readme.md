@@ -10,3 +10,12 @@
 
 多节点分布式部署。
 
+ 先获取http://192.168.10.6:5601/登录要输入的token
+先登录 elasticsearch容器：
+docker exec -it elasticsearch bash
+elasticsearch@9f78aa64dc13:~$ bin/elasticsearch-create-enrollment-token --scope kibana
+获取token
+
+再登录 kibana容器,获取验证码
+docker exec -it kibana bash
+kibana@d0abf410dd85:~$ bin/kibana-verification-code

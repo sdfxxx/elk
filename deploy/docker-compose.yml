@@ -2,10 +2,14 @@ version: '3.8'
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    image: elasticsearch:8.12.0
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.security.http.ssl.enabled=false
       - bootstrap.memory_lock=true
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ulimits:
@@ -13,7 +17,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./data:/usr/share/elasticsearch/data
+      - /mnt/win-share/elasticsearch/data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -21,27 +25,28 @@ services:
       - elk
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.17.0
+    image: logstash:8.12.0
     container_name: logstash
     volumes:
       - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     ports:
-      - "5044:5044"    # Beats input
+      - "5044:5044"
       - "5000:5000/tcp"
       - "5000:5000/udp"
-      - "9600:9600"    # Logstash API
+      - "9600:9600"
     depends_on:
       - elasticsearch
     networks:
       - elk
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.0
+    image: kibana:8.12.0
     container_name: kibana
     ports:
       - "5601:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=false
     depends_on:
       - elasticsearch
     networks:
